@@ -1,3 +1,7 @@
+using SkeletonBackend.Domain.Builds;
+using SkeletonBackend.Domain.Identity;
+using SkeletonBackend.Domain.Library;
+
 namespace SkeletonBackend.Domain.Games;
 
 public class Game
@@ -9,8 +13,12 @@ public class Game
     public string Description { get; set; } = null!;
 
     public Guid DeveloperId { get; set; }
+    public User Developer { get; set; } = null!;
 
     public string? CoverImageUrl { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public ICollection<Build> Builds { get; set; } = [];
+    public ICollection<LibraryItem> LibraryItems { get; set; } = [];
 }

@@ -1,3 +1,5 @@
+using SkeletonBackend.Domain.Games;
+
 namespace SkeletonBackend.Domain.Builds;
 
 public class Build
@@ -5,6 +7,7 @@ public class Build
     public Guid Id { get; set; }
 
     public Guid GameId { get; set; }
+    public Game Game { get; set; } = null!;
 
     public string Version { get; set; } = null!;
 
