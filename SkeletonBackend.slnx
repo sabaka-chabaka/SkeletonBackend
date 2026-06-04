@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="SkeletonBackend.Domain/SkeletonBackend.Domain.csproj" />
+  <Project Path="SkeletonBackend.Infrastructure/SkeletonBackend.Infrastructure.csproj" />
 </Solution>
