@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="SkeletonBackend.API/SkeletonBackend.API.csproj" />
   <Project Path="SkeletonBackend.Application/SkeletonBackend.Application.csproj" />
   <Project Path="SkeletonBackend.Domain/SkeletonBackend.Domain.csproj" />
   <Project Path="SkeletonBackend.Infrastructure/SkeletonBackend.Infrastructure.csproj" />
