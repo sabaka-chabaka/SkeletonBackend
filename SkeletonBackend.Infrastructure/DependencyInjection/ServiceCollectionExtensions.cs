@@ -26,9 +26,17 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBuildRepository, BuildRepository>();
         services.AddScoped<ILibraryRepository, LibraryRepository>();
 
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis")
+                                    ?? throw new InvalidOperationException("Connection string 'Redis' not found.");
+            options.InstanceName = "Skeleton_";
+        });
+
         services.AddScoped<IJwtProvider, JwtProvider>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IFileStorage, LocalFileStorage>();
+        services.AddScoped<ICacheService, CacheService>();
 
         return services;
     }

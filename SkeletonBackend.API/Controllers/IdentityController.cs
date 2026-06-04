@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SkeletonBackend.Application.Identity.Requests;
 using SkeletonBackend.Application.Identity.Services;
+using System.Security.Claims;
 
 namespace SkeletonBackend.API.Controllers;
 
@@ -27,5 +28,23 @@ public class IdentityController : ControllerBase
     {
         var response = await _identityService.LoginAsync(request, cancellationToken);
         return Ok(response);
+    }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrent(CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _identityService.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
     }
 }

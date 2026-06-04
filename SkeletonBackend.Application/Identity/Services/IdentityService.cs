@@ -1,3 +1,4 @@
+using SkeletonBackend.Application.Identity.DTOs;
 using SkeletonBackend.Application.Identity.Requests;
 using SkeletonBackend.Application.Identity.Responses;
 using SkeletonBackend.Application.Identity.Services;
@@ -10,8 +11,11 @@ namespace SkeletonBackend.Application.Identity.Services;
 public class IdentityService(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
-    IJwtProvider jwtProvider) : IIdentityService
+    IJwtProvider jwtProvider,
+    ICacheService cacheService) : IIdentityService
 {
+    private static string GetUserCacheKey(Guid id) => $"user_{id}";
+
     public async Task RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {
         var existingUser = await userRepository.GetByEmailAsync(request.Email, cancellationToken);
@@ -47,6 +51,29 @@ public class IdentityService(
         userRepository.Update(user);
         await userRepository.SaveChangesAsync(cancellationToken);
 
+        await cacheService.RemoveAsync(GetUserCacheKey(user.Id), cancellationToken);
+
         return new LoginResponse(token);
+    }
+
+    public async Task<UserDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = GetUserCacheKey(id);
+        var cachedUser = await cacheService.GetAsync<UserDto>(cacheKey, cancellationToken);
+        if (cachedUser is not null)
+        {
+            return cachedUser;
+        }
+
+        var user = await userRepository.GetByIdAsync(id, cancellationToken);
+        if (user is null)
+        {
+            return null;
+        }
+
+        var dto = new UserDto(user.Id, user.Username, user.Email, user.CreatedAt, user.LastLoginAt);
+        await cacheService.SetAsync(cacheKey, dto, TimeSpan.FromMinutes(30), cancellationToken);
+
+        return dto;
     }
 }
